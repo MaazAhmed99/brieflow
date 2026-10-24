@@ -1,8 +1,8 @@
 import { loadEnvConfig } from "@next/env";
 import { defineConfig } from "drizzle-kit";
 
-// Load .env.local the same way Next.js does.
-loadEnvConfig(process.cwd());
+// Load .env.local and .env.development the same way `next dev` does.
+loadEnvConfig(process.cwd(), true);
 
 export default defineConfig({
   dialect: "postgresql",

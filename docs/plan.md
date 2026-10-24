@@ -18,7 +18,7 @@ A web search on 23 Oct found no existing software product called any of these. I
 |---|---|---|
 | Auth library | **Better Auth** instead of Auth.js | Auth.js v5 never left beta (`5.0.0-beta.32`, last release July 2026), and its maintainers joined Better Auth in 2025 and point new projects there. Better Auth is stable (1.7.x), has a Drizzle adapter, and handles email and password login, sessions and social login. Data access rules stay in our own code either way. |
 | Next.js Cache Components | **Turn off for v1** | Nearly every app page depends on who is signed in, so caching gains little and adds Suspense rules to every session read. Turning it off keeps the code simple to explain. The landing page stays static either way. |
-| DB driver | Neon serverless driver through Drizzle (`neon-serverless` Pool) | It supports transactions, which "invoice paid + payment row + audit entry" needs. |
+| DB driver | Standard `pg` driver through Drizzle (changed 24 Oct) | Works with Neon over TCP (what Vercel recommends for its Node runtime) and with a local PGlite server (`db:local`), so the same code runs everywhere. Supports transactions. |
 | Tests | Vitest + PGlite (Postgres in-process) | Authorization tests run against real Postgres in seconds, offline and in CI, with no extra account. |
 | AI wiring | Our own `AiProvider` interface + each provider's official SDK | It mirrors `PaymentProvider`. The tool loop is our code, so I can explain it on a call. |
 

@@ -1,14 +1,15 @@
 // Wipes the database and fills it with the demo data.
-// Usage: corepack pnpm@9.15.4 db:seed   (reads DATABASE_URL and DEMO_USER_PASSWORD from .env.local)
+// Usage: corepack pnpm@9.15.4 db:seed
+// Reads DATABASE_URL and DEMO_USER_PASSWORD from .env.local (or .env.development).
 
 import { loadEnvConfig } from "@next/env";
-import { Pool } from "@neondatabase/serverless";
 import { hashPassword } from "better-auth/crypto";
-import { drizzle } from "drizzle-orm/neon-serverless";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import * as schema from "../src/server/db/schema";
 import { resetDatabase, seedDatabase } from "../src/server/db/seed/seed";
 
-loadEnvConfig(process.cwd());
+loadEnvConfig(process.cwd(), true);
 
 async function main() {
   const url = process.env.DATABASE_URL;
@@ -20,7 +21,7 @@ async function main() {
     throw new Error("DEMO_USER_PASSWORD must be at least 12 characters. Add it to .env.local.");
   }
 
-  const pool = new Pool({ connectionString: url });
+  const pool = new Pool({ connectionString: url, max: 1 });
   const db = drizzle({ client: pool, schema, casing: "snake_case" });
   const started = Date.now();
 
@@ -31,7 +32,7 @@ async function main() {
   });
 
   console.table(counts);
-  console.log(`Seeded in ${((Date.now() - started) / 1000).toFixed(1)} s`);
+  console.log(`Seeded ${new URL(url).hostname} in ${((Date.now() - started) / 1000).toFixed(1)} s`);
   await pool.end();
 }
 
