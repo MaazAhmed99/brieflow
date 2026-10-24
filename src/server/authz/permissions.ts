@@ -44,6 +44,30 @@ export function isStaff(viewer: { role: Role }) {
   return viewer.role !== "client";
 }
 
+export const PERMISSION_LABELS: Record<Permission, string> = {
+  "dashboard:view": "See the dashboard",
+  "client:read": "View clients",
+  "client:write": "Add and edit clients",
+  "project:read": "View projects",
+  "project:write": "Create and edit projects",
+  "task:write": "Create and update tasks",
+  "comment:write": "Comment on projects",
+  "file:upload": "Upload files",
+  "invoice:read": "View invoices",
+  "invoice:write": "Create invoices and mark them paid",
+  "invoice:pay": "Pay invoices online",
+  "finance:read": "View expenses and reports",
+  "sales:read": "View the sales pipeline",
+  "time:read": "View time tracking",
+  "hr:read": "View HR and leave",
+  "support:read": "View support tickets",
+  "team:read": "View the team",
+  "team:manage": "Invite people and change roles",
+  "activity:read": "View the audit log",
+  "settings:manage": "Manage organization settings",
+  "assistant:use": "Use the AI assistant",
+};
+
 export const ROLE_LABELS: Record<Role, string> = {
   admin: "Admin",
   manager: "Manager",

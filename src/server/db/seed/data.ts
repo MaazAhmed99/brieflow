@@ -186,6 +186,16 @@ export const INTERNAL_COMMENTS = [
   "Velocity is fine this sprint. Nothing blocking.",
 ];
 
+// Agency team updates that the client can see.
+export const AGENCY_UPDATES = [
+  "The staging link is ready for your review. Let us know what you think by Friday.",
+  "We've finished the homepage design and moved on to the inner pages.",
+  "Quick heads-up: we need the final product photos to keep the launch date.",
+  "All feedback from the last review is in. A new version is up on staging.",
+  "Launch checklist is done except the redirects.",
+  "The next invoice will cover the design phase we just completed.",
+];
+
 export const CLIENT_COMMENTS = [
   "Thanks, the new homepage looks great. A couple of small copy changes coming by email.",
   "Can we move the review call to next week? Our CEO is travelling.",

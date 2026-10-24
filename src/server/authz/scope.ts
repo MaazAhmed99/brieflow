@@ -24,6 +24,13 @@ export function scopeFor(viewer: ScopeViewer, table: ScopedTable): SQL {
   return and(sameOrganization, eq(table.clientId, viewer.clientId))!;
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Ids come from URLs; anything that isn't a UUID can't match a row. */
+export function isUuid(value: string) {
+  return UUID.test(value);
+}
+
 export class ForbiddenError extends Error {
   constructor(permission: Permission) {
     super(`Missing permission: ${permission}`);

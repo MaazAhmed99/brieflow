@@ -1,7 +1,7 @@
 import "server-only";
 import { and, asc, desc, eq, ilike, inArray, or } from "drizzle-orm";
 import type { Viewer } from "@/server/auth/viewer";
-import { assertCan, scopeFor } from "@/server/authz/scope";
+import { assertCan, isUuid, scopeFor } from "@/server/authz/scope";
 import { db } from "@/server/db/client";
 import {
   clients,
@@ -61,6 +61,7 @@ export async function listProjects(
 /** One project with its milestones and comments, or null if the viewer can't see it. */
 export async function getProject(viewer: Viewer, projectId: string) {
   assertCan(viewer, "project:read");
+  if (!isUuid(projectId)) return null;
   const isClient = viewer.role === "client";
 
   const [project] = await db

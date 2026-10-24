@@ -16,11 +16,13 @@ export async function viewerFor(db: TestDb, email: string): Promise<Viewer> {
       baseCurrency: s.organizations.baseCurrency,
       role: s.memberships.role,
       clientId: s.memberships.clientId,
+      clientName: s.clients.name,
       jobTitle: s.memberships.jobTitle,
     })
     .from(s.users)
     .innerJoin(s.memberships, eq(s.memberships.userId, s.users.id))
     .innerJoin(s.organizations, eq(s.organizations.id, s.memberships.organizationId))
+    .leftJoin(s.clients, eq(s.clients.id, s.memberships.clientId))
     .where(eq(s.users.email, email));
   if (!row) throw new Error(`No seeded user ${email}`);
   return row;

@@ -19,42 +19,65 @@ const vercelUrls = [
 const baseURL =
   process.env.BETTER_AUTH_URL ?? vercelUrls[0] ?? "http://localhost:3000";
 
-export const auth = betterAuth({
-  appName: siteConfig.name,
-  baseURL,
-  trustedOrigins: [baseURL, ...vercelUrls, "http://localhost:3000"],
-  secret: process.env.BETTER_AUTH_SECRET,
-  database: drizzleAdapter(db, {
-    provider: "pg",
-    schema: {
-      user: users,
-      session: sessions,
-      account: accounts,
-      verification: verifications,
+function createAuth() {
+  return betterAuth({
+    appName: siteConfig.name,
+    baseURL,
+    trustedOrigins: [baseURL, ...vercelUrls, "http://localhost:3000"],
+    secret: process.env.BETTER_AUTH_SECRET,
+    database: drizzleAdapter(db, {
+      provider: "pg",
+      schema: {
+        user: users,
+        session: sessions,
+        account: accounts,
+        verification: verifications,
+      },
+    }),
+    advanced: {
+      // Let Postgres generate UUIDs, matching the rest of the schema.
+      database: { generateId: "uuid" },
     },
-  }),
-  advanced: {
-    // Let Postgres generate UUIDs, matching the rest of the schema.
-    database: { generateId: "uuid" },
-  },
-  emailAndPassword: {
-    enabled: true,
-    // No public sign-up: visitors use the demo accounts, and admins invite people.
-    disableSignUp: true,
-  },
-  session: {
-    // Keep the session in a signed cookie for 5 minutes to skip a database read per request.
-    cookieCache: { enabled: true, maxAge: 5 * 60 },
-  },
-  rateLimit: {
-    enabled: true,
-    window: 60,
-    max: 100,
-    customRules: {
-      "/sign-in/email": { window: 60, max: 10 },
+    emailAndPassword: {
+      enabled: true,
+      // No public sign-up: visitors use the demo accounts, and admins invite people.
+      disableSignUp: true,
     },
-  },
-  telemetry: { enabled: false },
-  // Lets Server Actions set the session cookie after signing in.
-  plugins: [nextCookies()],
-});
+    session: {
+      // Keep the session in a signed cookie for 5 minutes to skip a database read per request.
+      cookieCache: { enabled: true, maxAge: 5 * 60 },
+    },
+    rateLimit: {
+      enabled: true,
+      window: 60,
+      max: 100,
+      customRules: {
+        "/sign-in/email": { window: 60, max: 10 },
+      },
+    },
+    telemetry: { enabled: false },
+    // Lets Server Actions set the session cookie after signing in.
+    plugins: [nextCookies()],
+  });
+}
+
+/**
+ * Sign-in needs a database and, in production, a secret. Until both are set
+ * (for example on a fresh Vercel project) the login page shows a notice
+ * instead of failing.
+ */
+export function isAuthConfigured() {
+  const hasSecret = Boolean(process.env.BETTER_AUTH_SECRET) || process.env.NODE_ENV !== "production";
+  return Boolean(process.env.DATABASE_URL) && hasSecret;
+}
+
+let instance: ReturnType<typeof createAuth> | undefined;
+
+/** The Better Auth instance, created on first use. */
+export function getAuth() {
+  if (!isAuthConfigured()) {
+    throw new Error("Sign-in isn't configured: set DATABASE_URL and BETTER_AUTH_SECRET.");
+  }
+  instance ??= createAuth();
+  return instance;
+}

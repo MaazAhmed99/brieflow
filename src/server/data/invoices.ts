@@ -1,7 +1,7 @@
 import "server-only";
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import type { Viewer } from "@/server/auth/viewer";
-import { assertCan, scopeFor } from "@/server/authz/scope";
+import { assertCan, isUuid, scopeFor } from "@/server/authz/scope";
 import { db } from "@/server/db/client";
 import { clients, invoiceItems, invoices, invoiceStatus, projects } from "@/server/db/schema";
 
@@ -48,6 +48,7 @@ export async function listInvoices(viewer: Viewer, filters: { status?: InvoiceSt
 /** One invoice with its line items, or null if the viewer can't see it. */
 export async function getInvoice(viewer: Viewer, invoiceId: string) {
   assertCan(viewer, "invoice:read");
+  if (!isUuid(invoiceId)) return null;
   const [invoice] = await db
     .select({ ...invoiceColumns, notes: invoices.notes })
     .from(invoices)

@@ -9,6 +9,7 @@ import type {
 import { demoAccounts } from "@/config/demo";
 import * as s from "../schema";
 import {
+  AGENCY_UPDATES,
   CLIENT_COMMENTS,
   CLIENT_NOTES,
   CODENAMES,
@@ -554,7 +555,9 @@ function addProjectWork(ctx: Ctx, organizationId: string, project: ProjectInfo, 
       organizationId,
       projectId: project.id,
       authorId: byClient ? project.client.portalUserId : pick(project.memberIds),
-      body: pick(byClient ? CLIENT_COMMENTS : INTERNAL_COMMENTS),
+      body: pick(
+        byClient ? CLIENT_COMMENTS : visibility === "client" ? AGENCY_UPDATES : INTERNAL_COMMENTS,
+      ),
       visibility,
       createdAt: between(project.start, workEnd),
     });
@@ -614,7 +617,8 @@ function addInvoices(
     let paidAt: Date | null = null;
     if (issue > addDays(today, -3) && chance(0.4)) status = "draft";
     else if (due >= today) status = "sent";
-    else if (chance(0.87)) {
+    // Recently due invoices are often still open; old ones almost always got paid.
+    else if (chance(due < addDays(today, -60) ? 0.99 : 0.7)) {
       status = "paid";
       paidAt = minDate(addDays(issue, int(2, terms + 12)), addDays(now, -0.05));
     } else status = "sent";

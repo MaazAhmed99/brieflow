@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { InlineScript } from "@/components/inline-script";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteConfig } from "@/config/site";
+import { themeScript } from "@/lib/theme";
 import "./globals.css";
 
 // globals.css maps Tailwind's font-sans to --font-sans, so Geist must use that name.
@@ -24,11 +28,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // The theme script sets the "dark" class before React hydrates, hence suppressHydrationWarning.
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        <InlineScript html={themeScript} />
+      </head>
+      <body className="min-h-full flex flex-col">
+        <TooltipProvider>{children}</TooltipProvider>
+        <Toaster />
+      </body>
     </html>
   );
 }

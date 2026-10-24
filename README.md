@@ -14,11 +14,14 @@ Requires Node 22 and pnpm 9 (this repo uses pnpm through corepack).
 
 ```bash
 corepack pnpm@9.15.4 install
-cp .env.example .env.local        # then fill in the values
+cp .env.example .env.local        # set BETTER_AUTH_SECRET and DEMO_USER_PASSWORD
+corepack pnpm@9.15.4 db:local     # local Postgres (PGlite); leave it running in its own terminal
 corepack pnpm@9.15.4 db:migrate   # create the tables
 corepack pnpm@9.15.4 db:seed      # load the demo data
 corepack pnpm@9.15.4 dev
 ```
+
+No Neon account is needed locally: `.env.development` points the app at `db:local`. Put a Neon `DATABASE_URL` in `.env.local` to use Neon instead.
 
 Run the tests with `corepack pnpm@9.15.4 test`.
 

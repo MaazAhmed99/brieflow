@@ -5,8 +5,8 @@ import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
 import { can, type Permission, type Role } from "@/server/authz/permissions";
 import { db } from "@/server/db/client";
-import { memberships, organizations } from "@/server/db/schema";
-import { auth } from "./auth";
+import { clients, memberships, organizations } from "@/server/db/schema";
+import { getAuth, isAuthConfigured } from "./auth";
 
 // The signed-in person, their organization and their role. Every data
 // function takes a Viewer, so access rules always know who is asking.
@@ -20,12 +20,14 @@ export type Viewer = {
   baseCurrency: string;
   role: Role;
   clientId: string | null;
+  clientName: string | null;
   jobTitle: string | null;
 };
 
 // cache() runs this once per request, however many components call it.
 export const getViewer = cache(async (): Promise<Viewer | null> => {
-  const session = await auth.api.getSession({ headers: await headers() });
+  if (!isAuthConfigured()) return null;
+  const session = await getAuth().api.getSession({ headers: await headers() });
   if (!session) return null;
 
   const [membership] = await db
@@ -35,10 +37,12 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
       baseCurrency: organizations.baseCurrency,
       role: memberships.role,
       clientId: memberships.clientId,
+      clientName: clients.name,
       jobTitle: memberships.jobTitle,
     })
     .from(memberships)
     .innerJoin(organizations, eq(organizations.id, memberships.organizationId))
+    .leftJoin(clients, eq(clients.id, memberships.clientId))
     .where(eq(memberships.userId, session.user.id))
     .limit(1);
   if (!membership) return null;
