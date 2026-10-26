@@ -2,6 +2,7 @@ import { ArrowLeftIcon, CreditCardIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { InvoiceDocument } from "@/components/invoice-document";
 import { PageHeader } from "@/components/page-header";
 import { InvoiceStatusBadge } from "@/components/status-badges";
 import { Button } from "@/components/ui/button";
@@ -33,41 +34,8 @@ export default async function PortalInvoicePage({ params }: PageProps<"/portal/i
         <CardHeader>
           <CardTitle>Details</CardTitle>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-left text-muted-foreground">
-              <tr className="border-b">
-                <th className="py-2 font-medium">Description</th>
-                <th className="py-2 text-right font-medium">Qty</th>
-                <th className="py-2 text-right font-medium">Rate</th>
-                <th className="py-2 text-right font-medium">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoice.items.map((item) => (
-                <tr key={item.id} className="border-b last:border-0">
-                  <td className="py-2 pr-4">{item.description}</td>
-                  <td className="py-2 text-right tabular-nums">{item.quantity}</td>
-                  <td className="py-2 text-right tabular-nums">{money(item.unitPriceCents)}</td>
-                  <td className="py-2 text-right tabular-nums">{money(item.amountCents)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <dl className="ml-auto mt-4 w-full max-w-xs space-y-1 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">Subtotal</dt>
-              <dd className="tabular-nums">{money(invoice.subtotalCents)}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">Tax</dt>
-              <dd className="tabular-nums">{money(invoice.taxCents)}</dd>
-            </div>
-            <div className="flex justify-between border-t pt-2 text-base font-semibold">
-              <dt>Total</dt>
-              <dd className="tabular-nums">{money(invoice.totalCents)}</dd>
-            </div>
-          </dl>
+        <CardContent>
+          <InvoiceDocument {...invoice} />
         </CardContent>
         {invoice.status === "sent" && (
           <CardFooter className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
