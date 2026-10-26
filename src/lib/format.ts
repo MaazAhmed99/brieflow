@@ -22,6 +22,11 @@ export function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
 
+/** The date `days` from today as YYYY-MM-DD (negative for the past). */
+export function isoDaysFromToday(days: number) {
+  return new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10);
+}
+
 export function isOverdue(invoice: { status: string; dueDate: string }) {
   return invoice.status === "sent" && invoice.dueDate < todayIso();
 }

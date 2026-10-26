@@ -1,0 +1,6 @@
+# Store and check out these files byte for byte (no line-ending conversion).
+*.pdf binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary

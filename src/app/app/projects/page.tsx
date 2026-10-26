@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
 import { ProjectsTable } from "@/components/tables/projects-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { isoDaysFromToday, todayIso } from "@/lib/format";
 import { requirePermission } from "@/server/auth/viewer";
 import { listProjects } from "@/server/data/projects";
 import { ProjectsBoard } from "./projects-board";
@@ -15,11 +16,8 @@ export default async function ProjectsPage() {
   const projects = await listProjects(viewer);
   const active = projects.filter((p) => p.status === "active");
   const atRisk = active.filter((p) => p.health !== "on_track").length;
-  const dueSoon = active.filter((p) => {
-    if (!p.dueDate) return false;
-    const days = (new Date(p.dueDate).getTime() - Date.now()) / 86_400_000;
-    return days >= 0 && days <= 30;
-  }).length;
+  const [today, in30Days] = [todayIso(), isoDaysFromToday(30)];
+  const dueSoon = active.filter((p) => p.dueDate && p.dueDate >= today && p.dueDate <= in30Days).length;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
