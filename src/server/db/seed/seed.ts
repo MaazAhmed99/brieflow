@@ -446,9 +446,9 @@ function buildAgency(ctx: Ctx, config: AgencyConfig): Agency {
         health:
           status === "active"
             ? weighted([
-                ["on_track", 65],
-                ["at_risk", 25],
-                ["off_track", 10],
+                ["on_track", 75],
+                ["at_risk", 18],
+                ["off_track", 7],
               ] as const)
             : status === "on_hold"
               ? "at_risk"

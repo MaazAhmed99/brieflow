@@ -6,9 +6,13 @@ import { db } from "@/server/db/client";
 import {
   clients,
   comments,
+  files,
+  memberships,
   milestones,
+  projectMembers,
   projects,
   projectStatus,
+  tasks,
   users,
 } from "@/server/db/schema";
 
@@ -88,7 +92,7 @@ export async function getProject(viewer: Viewer, projectId: string) {
     .limit(1);
   if (!project) return null;
 
-  const [projectMilestones, projectComments] = await Promise.all([
+  const [projectMilestones, projectComments, projectFiles, projectTasks, team] = await Promise.all([
     db
       .select()
       .from(milestones)
@@ -112,6 +116,49 @@ export async function getProject(viewer: Viewer, projectId: string) {
         ),
       )
       .orderBy(asc(comments.createdAt)),
+    db
+      .select({
+        id: files.id,
+        name: files.name,
+        url: files.blobUrl,
+        contentType: files.contentType,
+        sizeBytes: files.sizeBytes,
+        createdAt: files.createdAt,
+        uploaderName: users.name,
+      })
+      .from(files)
+      .leftJoin(users, eq(users.id, files.uploadedBy))
+      .where(eq(files.projectId, project.id))
+      .orderBy(desc(files.createdAt)),
+    // Tasks and the team list are internal to the agency.
+    isClient
+      ? Promise.resolve([])
+      : db
+          .select({
+            id: tasks.id,
+            title: tasks.title,
+            status: tasks.status,
+            priority: tasks.priority,
+            dueDate: tasks.dueDate,
+            milestoneId: tasks.milestoneId,
+            assigneeName: users.name,
+          })
+          .from(tasks)
+          .leftJoin(users, eq(users.id, tasks.assigneeId))
+          .where(eq(tasks.projectId, project.id))
+          .orderBy(asc(tasks.position)),
+    isClient
+      ? Promise.resolve([])
+      : db
+          .select({ id: users.id, name: users.name, jobTitle: memberships.jobTitle })
+          .from(projectMembers)
+          .innerJoin(users, eq(users.id, projectMembers.userId))
+          .leftJoin(
+            memberships,
+            and(eq(memberships.userId, users.id), eq(memberships.organizationId, viewer.organizationId)),
+          )
+          .where(eq(projectMembers.projectId, project.id))
+          .orderBy(asc(users.name)),
   ]);
 
   return {
@@ -119,5 +166,8 @@ export async function getProject(viewer: Viewer, projectId: string) {
     budgetCents: isClient ? null : project.budgetCents,
     milestones: projectMilestones,
     comments: projectComments,
+    files: projectFiles,
+    tasks: projectTasks,
+    team,
   };
 }
