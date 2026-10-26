@@ -931,25 +931,37 @@ function addPreviewModules(ctx: Ctx, agency: Agency) {
     });
   }
 
-  // Time tracking: the last 8 weeks on active projects
-  for (const project of agency.projects.filter((p) => p.status === "active")) {
-    for (const userId of project.memberIds) {
-      for (let back = 56; back >= 0; back--) {
-        const day = addDays(today, -back);
-        const weekday = day.getUTCDay();
-        if (weekday === 0 || weekday === 6 || day < project.start || !chance(0.37)) continue;
+  // Time tracking, last 8 weeks: each person logs a realistic working day
+  // (6 to 8.5 hours) split across one to three of their active projects.
+  const activeProjects = agency.projects.filter((p) => p.status === "active");
+  for (const person of agency.staff) {
+    const theirProjects = activeProjects.filter((p) => p.memberIds.includes(person.id));
+    if (theirProjects.length === 0) continue;
+    for (let back = 56; back >= 0; back--) {
+      const day = addDays(today, -back);
+      const weekday = day.getUTCDay();
+      if (weekday === 0 || weekday === 6 || !chance(0.85)) continue;
+      const started = theirProjects.filter((p) => p.start <= day);
+      if (started.length === 0) continue;
+      const split = pickSome(started, 1, 3);
+      let minutesLeft = int(12, 17) * 30;
+      split.forEach((project, index) => {
+        const minutes =
+          index === split.length - 1 ? minutesLeft : Math.max(30, Math.round((minutesLeft * int(30, 60)) / 100 / 30) * 30);
+        minutesLeft -= minutes;
+        if (minutes <= 0) return;
         rows.timeEntries.push({
           organizationId,
-          userId,
+          userId: person.id,
           projectId: project.id,
           taskId: pick(project.taskIds),
           workedOn: isoDate(day),
-          minutes: int(2, 12) * 30,
+          minutes,
           billable: chance(0.85),
           note: pick(TIME_NOTES),
           createdAt: addDays(day, 0.75),
         });
-      }
+      });
     }
   }
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { InlineScript } from "@/components/inline-script";
+import { ThemeSync } from "@/components/theme-sync";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteConfig } from "@/config/site";
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <InlineScript html={themeScript} />
       </head>
       <body className="min-h-full flex flex-col">
+        <ThemeSync />
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
       </body>

@@ -3,7 +3,7 @@ import { and, asc, desc, eq, gte, ne } from "drizzle-orm";
 import type { Viewer } from "@/server/auth/viewer";
 import { assertCan, scopeFor } from "@/server/authz/scope";
 import { db } from "@/server/db/client";
-import { activityLog, invoices, projects, tasks, users } from "@/server/db/schema";
+import { activityLog, clients, invoices, projects, tasks, users } from "@/server/db/schema";
 import { getCurrencyConverter } from "./rates";
 
 /** Paid revenue per month for the last 12 months, in the organization's base currency. */
@@ -36,6 +36,42 @@ export async function getRevenueByMonth(viewer: Viewer) {
     if (month) month.cents += fx.toBase(invoice.totalCents, invoice.currency);
   }
   return { months, currency: fx.baseCurrency, ratesSource: fx.source };
+}
+
+/** Paid revenue per client over the last 12 months, in the base currency, largest first. */
+export async function getRevenueByClient(viewer: Viewer, limit = 8) {
+  assertCan(viewer, "finance:read");
+  const since = new Date(Date.now() - 365 * 86_400_000);
+  const [paid, fx] = await Promise.all([
+    db
+      .select({
+        totalCents: invoices.totalCents,
+        currency: invoices.currency,
+        clientId: clients.id,
+        clientName: clients.name,
+      })
+      .from(invoices)
+      .innerJoin(clients, eq(clients.id, invoices.clientId))
+      .where(
+        and(
+          scopeFor(viewer, { organizationId: invoices.organizationId, clientId: invoices.clientId }),
+          eq(invoices.status, "paid"),
+          gte(invoices.paidAt, since),
+        ),
+      ),
+    getCurrencyConverter(viewer),
+  ]);
+
+  const totals = new Map<string, { clientId: string; clientName: string; cents: number }>();
+  for (const invoice of paid) {
+    const entry = totals.get(invoice.clientId) ?? { clientId: invoice.clientId, clientName: invoice.clientName, cents: 0 };
+    entry.cents += fx.toBase(invoice.totalCents, invoice.currency);
+    totals.set(invoice.clientId, entry);
+  }
+  return {
+    clients: [...totals.values()].sort((a, b) => b.cents - a.cents).slice(0, limit),
+    currency: fx.baseCurrency,
+  };
 }
 
 /** The viewer's own open tasks, soonest due first. */
