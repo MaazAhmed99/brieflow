@@ -53,7 +53,7 @@ describe("seed data", () => {
       .select({ clientId: s.memberships.clientId })
       .from(s.memberships)
       .innerJoin(s.users, eq(s.users.id, s.memberships.userId))
-      .where(eq(s.users.email, "client@harborfinch.example.com"));
+      .where(eq(s.users.email, "client@harborandfinch.example.com"));
     const unpaid = await db
       .select({ dueDate: s.invoices.dueDate })
       .from(s.invoices)

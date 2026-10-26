@@ -17,7 +17,8 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
   return (
     <SidebarProvider>
       <AppSidebar role={viewer.role} organizationName={viewer.organizationName} />
-      <SidebarInset>
+      {/* min-w-0 lets wide tables scroll inside the page instead of widening it. */}
+      <SidebarInset className="min-w-0">
         <DemoBanner roleLabel={roleLabel} />
         <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur">
           <SidebarTrigger className="-ml-1" />
@@ -29,7 +30,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
             />
           </div>
         </header>
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+        <div className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

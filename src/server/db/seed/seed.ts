@@ -618,7 +618,7 @@ function addInvoices(
     if (issue > addDays(today, -3) && chance(0.4)) status = "draft";
     else if (due >= today) status = "sent";
     // Recently due invoices are often still open; old ones almost always got paid.
-    else if (chance(due < addDays(today, -60) ? 0.99 : 0.7)) {
+    else if (chance(due < addDays(today, -60) ? 0.99 : 0.85)) {
       status = "paid";
       paidAt = minDate(addDays(issue, int(2, terms + 12)), addDays(now, -0.05));
     } else status = "sent";

@@ -41,6 +41,31 @@ export function ProjectStatusBadge({ status }: { status: string }) {
   return <ToneBadge color={color}>{label}</ToneBadge>;
 }
 
+export function HealthBadge({ health }: { health: string }) {
+  const map: Record<string, [keyof typeof tone, string]> = {
+    on_track: ["green", "On track"],
+    at_risk: ["amber", "At risk"],
+    off_track: ["red", "Off track"],
+  };
+  const [color, label] = map[health] ?? ["gray", health];
+  return <ToneBadge color={color}>{label}</ToneBadge>;
+}
+
+export function ClientStatusBadge({ status }: { status: string }) {
+  const map: Record<string, [keyof typeof tone, string]> = {
+    active: ["green", "Active"],
+    paused: ["amber", "Paused"],
+    archived: ["gray", "Archived"],
+  };
+  const [color, label] = map[status] ?? ["gray", status];
+  return <ToneBadge color={color}>{label}</ToneBadge>;
+}
+
+/** Any status with an explicit colour, for the Preview modules. */
+export function StatusPill({ color, children }: { color: keyof typeof tone; children: React.ReactNode }) {
+  return <ToneBadge color={color}>{children}</ToneBadge>;
+}
+
 export function MilestoneStatusBadge({ status }: { status: string }) {
   const map: Record<string, [keyof typeof tone, string]> = {
     upcoming: ["gray", "Upcoming"],

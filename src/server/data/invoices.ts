@@ -27,7 +27,10 @@ const invoiceColumns = {
   projectName: projects.name,
 };
 
-export async function listInvoices(viewer: Viewer, filters: { status?: InvoiceStatus[] } = {}) {
+export async function listInvoices(
+  viewer: Viewer,
+  filters: { status?: InvoiceStatus[]; clientId?: string; projectId?: string } = {},
+) {
   assertCan(viewer, "invoice:read");
   return db
     .select(invoiceColumns)
@@ -37,6 +40,8 @@ export async function listInvoices(viewer: Viewer, filters: { status?: InvoiceSt
     .where(
       and(
         invoiceScope(viewer),
+        filters.clientId ? eq(invoices.clientId, filters.clientId) : undefined,
+        filters.projectId ? eq(invoices.projectId, filters.projectId) : undefined,
         filters.status?.length ? inArray(invoices.status, filters.status) : undefined,
         // Clients never see drafts the agency hasn't sent yet.
         viewer.role === "client" ? inArray(invoices.status, ["sent", "paid"]) : undefined,

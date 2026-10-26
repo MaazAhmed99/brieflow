@@ -19,7 +19,7 @@ const projectScope = (viewer: Viewer) =>
 
 export async function listProjects(
   viewer: Viewer,
-  filters: { status?: ProjectStatus[]; search?: string } = {},
+  filters: { status?: ProjectStatus[]; search?: string; clientId?: string } = {},
 ) {
   assertCan(viewer, "project:read");
   const isClient = viewer.role === "client";
@@ -42,6 +42,7 @@ export async function listProjects(
     .where(
       and(
         projectScope(viewer),
+        filters.clientId ? eq(projects.clientId, filters.clientId) : undefined,
         filters.status?.length ? inArray(projects.status, filters.status) : undefined,
         filters.search
           ? or(

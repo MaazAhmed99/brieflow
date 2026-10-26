@@ -32,7 +32,7 @@ export const demoAccounts = [
   {
     role: "client",
     label: "Client",
-    email: "client@harborfinch.example.com",
+    email: "client@harborandfinch.example.com",
     description: "The client portal for Harbor & Finch",
   },
 ] as const;
