@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // No floating dev badge (it would show up in screenshots).
+  devIndicators: false,
   experimental: {
     // File uploads (max 2 MB, checked again on the server) go through a Server
     // Action; leave room for the multipart overhead.

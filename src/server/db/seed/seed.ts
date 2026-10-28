@@ -458,7 +458,8 @@ function buildAgency(ctx: Ctx, config: AgencyConfig): Agency {
         startDate: isoDate(start),
         dueDate: isoDate(due),
         managerId,
-        createdAt: minDate(addDays(start, -int(5, 20)), now),
+        // Planned projects start later, but were still created in the past.
+        createdAt: minDate(addDays(start, -int(5, 20)), addDays(now, -int(1, 10))),
       });
       for (const userId of memberIds) {
         rows.projectMembers.push({ organizationId, projectId: project.id, userId });
