@@ -19,7 +19,10 @@ export const roadmap: RoadmapSection[] = [
       { title: "Clients, projects and invoices", detail: "Searchable tables, a project board, detail pages and CSV export." },
       { title: "Mark invoices paid", detail: "Records the payment and writes the audit log in one transaction." },
       { title: "Team, permissions and audit log", detail: "Who can do what, and a record of every change." },
-      { title: "Client portal (read-only)", detail: "Clients see their own projects, milestones, comments and invoices." },
+      { title: "Client portal", detail: "Clients see their own projects, files, comments and invoices, and pay online." },
+      { title: "Online payments", detail: "A clearly labelled demo checkout today; Stripe test mode switches on when connected." },
+      { title: "Comments", detail: "For the agency team and clients; staff choose what the client sees." },
+      { title: "Nightly demo reset", detail: "Restores the sample data and fetches the day's ECB exchange rates." },
     ],
   },
   {
@@ -27,10 +30,9 @@ export const roadmap: RoadmapSection[] = [
     status: "in-progress",
     target: "Friday 30 October 2026",
     items: [
+      { title: "Live demo on a hosted database", detail: "Connecting the production database so the demo sign-in works on this site." },
       { title: "AI assistant", detail: "Built and tested: answers questions about clients, projects and invoices through the same access rules. Goes live once a free-tier model key is added." },
-      { title: "Online payments", detail: "Clients pay invoices by card with Stripe in test mode." },
-      { title: "Comments and file uploads", detail: "For both the agency team and clients." },
-      { title: "Nightly demo reset", detail: "Restores the sample data every night." },
+      { title: "File uploads", detail: "Built: private storage, type checks and access-checked downloads. Goes live once file storage is connected." },
     ],
   },
   {
