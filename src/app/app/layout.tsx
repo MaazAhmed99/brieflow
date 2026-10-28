@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
 import { AppBreadcrumb } from "@/components/app-shell/app-breadcrumb";
+import { AssistantLauncher } from "@/components/assistant/assistant-launcher";
+import { AssistantProvider } from "@/components/assistant/assistant-provider";
+import { assistantConfigFor } from "@/server/ai/config";
 import { AppSidebar } from "@/components/app-shell/app-sidebar";
 import { DemoBanner } from "@/components/app-shell/demo-banner";
 import { UserMenu } from "@/components/app-shell/user-menu";
@@ -15,6 +18,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
   const roleLabel = ROLE_LABELS[viewer.role];
 
   return (
+    <AssistantProvider config={assistantConfigFor(viewer)}>
     <SidebarProvider>
       <AppSidebar role={viewer.role} organizationName={viewer.organizationName} />
       {/* min-w-0 lets wide tables scroll inside the page instead of widening it. */}
@@ -24,7 +28,8 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-1 data-[orientation=vertical]:h-4" />
           <AppBreadcrumb />
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <AssistantLauncher />
             <UserMenu
               user={{ name: viewer.name, email: viewer.email, roleLabel, settingsHref: "/app/settings" }}
             />
@@ -33,5 +38,6 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
         <div className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</div>
       </SidebarInset>
     </SidebarProvider>
+    </AssistantProvider>
   );
 }

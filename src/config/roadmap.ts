@@ -25,9 +25,9 @@ export const roadmap: RoadmapSection[] = [
   {
     title: "In progress",
     status: "in-progress",
-    target: "Wednesday 28 October 2026",
+    target: "Friday 30 October 2026",
     items: [
-      { title: "AI assistant", detail: "Ask questions about your clients, projects and invoices, on a free-tier model, respecting the same access rules." },
+      { title: "AI assistant", detail: "Built and tested: answers questions about clients, projects and invoices through the same access rules. Goes live once a free-tier model key is added." },
       { title: "Online payments", detail: "Clients pay invoices by card with Stripe in test mode." },
       { title: "Comments and file uploads", detail: "For both the agency team and clients." },
       { title: "Nightly demo reset", detail: "Restores the sample data every night." },
@@ -36,7 +36,7 @@ export const roadmap: RoadmapSection[] = [
   {
     title: "Next",
     status: "planned",
-    target: "Sunday 1 November 2026",
+    target: "November 2026",
     items: [
       { title: "REST API and webhooks", detail: "Versioned read-only API with API keys and docs; signed webhooks for automation tools." },
       { title: "Emails and real-time notifications", detail: "Invoice emails and live updates when a client comments or pays." },

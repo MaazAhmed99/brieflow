@@ -2,6 +2,8 @@
 
 Written 23 Oct 2026 from `D:\claude md files\client-portal-project-prompt.md`. **Approved 23 Oct**: name Brieflow, Better Auth, Cache Components off, and the rest as written below.
 
+**Schedule revised 27 Oct** (Maaz's choice): v1 moves to Friday 30 Oct, AI assistant first. The public `/roadmap` page tracks what's done.
+
 ## 1. Product name: pick one
 
 A web search on 23 Oct found no existing software product called any of these. I haven't checked domains or trademarks.

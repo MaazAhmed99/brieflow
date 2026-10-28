@@ -123,6 +123,23 @@ export async function getInvoice(viewer: Viewer, invoiceId: string) {
   return { ...invoice, items, payments: invoicePayments, history };
 }
 
+/** The id of the invoice with this number (e.g. "INV-1042"), if the viewer can see it. */
+export async function findInvoiceIdByNumber(viewer: Viewer, number: string) {
+  assertCan(viewer, "invoice:read");
+  const [row] = await db
+    .select({ id: invoices.id })
+    .from(invoices)
+    .where(
+      and(
+        eq(invoices.number, number.trim().toUpperCase()),
+        invoiceScope(viewer),
+        viewer.role === "client" ? inArray(invoices.status, ["sent", "paid"]) : undefined,
+      ),
+    )
+    .limit(1);
+  return row?.id ?? null;
+}
+
 export type MarkPaidResult = { ok: true; number: string } | { ok: false; error: string };
 
 /**
