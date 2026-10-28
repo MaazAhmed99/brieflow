@@ -13,7 +13,8 @@ vi.mock("@/server/db/client", () => ({
   },
 }));
 
-const { listInvoices, markInvoicePaid } = await import("@/server/data/invoices");
+const { listInvoices } = await import("@/server/data/invoices");
+const { markInvoicePaid } = await import("@/server/data/payments");
 
 let db: TestDb;
 let close: () => Promise<void>;

@@ -1,10 +1,7 @@
 import "server-only";
-import { randomUUID } from "node:crypto";
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
-import { formatMoney } from "@/lib/format";
 import type { Viewer } from "@/server/auth/viewer";
 import { assertCan, isUuid, scopeFor } from "@/server/authz/scope";
-import { recordActivity } from "@/server/audit";
 import { db } from "@/server/db/client";
 import {
   activityLog,
@@ -138,56 +135,4 @@ export async function findInvoiceIdByNumber(viewer: Viewer, number: string) {
     )
     .limit(1);
   return row?.id ?? null;
-}
-
-export type MarkPaidResult = { ok: true; number: string } | { ok: false; error: string };
-
-/**
- * Records a manual payment (for example a bank transfer) and marks the invoice
- * paid. One transaction: payment row, invoice status and audit entry are saved
- * together or not at all. The row lock stops a double click paying twice.
- */
-export async function markInvoicePaid(viewer: Viewer, invoiceId: string): Promise<MarkPaidResult> {
-  assertCan(viewer, "invoice:write");
-  if (!isUuid(invoiceId)) return { ok: false, error: "Invoice not found." };
-
-  return db.transaction(async (tx) => {
-    const [invoice] = await tx
-      .select({
-        id: invoices.id,
-        number: invoices.number,
-        status: invoices.status,
-        totalCents: invoices.totalCents,
-        currency: invoices.currency,
-      })
-      .from(invoices)
-      .where(and(eq(invoices.id, invoiceId), eq(invoices.organizationId, viewer.organizationId)))
-      .for("update");
-
-    if (!invoice) return { ok: false, error: "Invoice not found." };
-    if (invoice.status !== "sent") {
-      return { ok: false, error: `Only open invoices can be marked paid (this one is ${invoice.status}).` };
-    }
-
-    const paidAt = new Date();
-    await tx.insert(payments).values({
-      organizationId: viewer.organizationId,
-      invoiceId: invoice.id,
-      provider: "manual",
-      providerRef: `manual_${randomUUID()}`,
-      amountCents: invoice.totalCents,
-      currency: invoice.currency,
-      status: "succeeded",
-      createdAt: paidAt,
-    });
-    await tx.update(invoices).set({ status: "paid", paidAt }).where(eq(invoices.id, invoice.id));
-    await recordActivity(tx, viewer, {
-      action: "invoice.paid",
-      entityType: "invoice",
-      entityId: invoice.id,
-      summary: `${viewer.name} marked invoice ${invoice.number} as paid (${formatMoney(invoice.totalCents, invoice.currency)})`,
-      metadata: { method: "manual" },
-    });
-    return { ok: true, number: invoice.number };
-  });
 }
