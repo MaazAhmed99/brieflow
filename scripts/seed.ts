@@ -8,6 +8,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "../src/server/db/schema";
 import { resetDatabase, seedDatabase } from "../src/server/db/seed/seed";
+import { refreshExchangeRates } from "../src/server/integrations/exchange-rates";
 
 loadEnvConfig(process.cwd(), true);
 
@@ -33,6 +34,14 @@ async function main() {
 
   console.table(counts);
   console.log(`Seeded ${new URL(url).hostname} in ${((Date.now() - started) / 1000).toFixed(1)} s`);
+
+  // Best effort: today's ECB rates instead of the fixed demo ones.
+  try {
+    const { date, rates } = await refreshExchangeRates(db);
+    console.log(`Exchange rates from Frankfurter (${date}):`, rates);
+  } catch (error) {
+    console.warn("Couldn't fetch exchange rates; keeping the fixed demo rates.", (error as Error).message);
+  }
   await pool.end();
 }
 

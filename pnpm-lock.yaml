@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@faker-js/faker':
+        specifier: ^10.6.0
+        version: 10.6.0
       '@google/genai':
         specifier: 2.31.0
         version: 2.31.0(@modelcontextprotocol/sdk@1.32.1(zod@4.6.7))
@@ -90,9 +93,6 @@ importers:
       '@electric-sql/pglite-socket':
         specifier: 0.2.14
         version: 0.2.14(@electric-sql/pglite-age@0.0.12(@electric-sql/pglite@0.5.11))(@electric-sql/pglite-pg_hashids@0.0.12(@electric-sql/pglite@0.5.11))(@electric-sql/pglite-pg_ivm@0.0.12(@electric-sql/pglite@0.5.11))(@electric-sql/pglite-pg_textsearch@0.0.13(@electric-sql/pglite@0.5.11))(@electric-sql/pglite-pg_uuidv7@0.0.12(@electric-sql/pglite@0.5.11))(@electric-sql/pglite-pgtap@0.0.12(@electric-sql/pglite@0.5.11))(@electric-sql/pglite-pgvector@0.0.12(@electric-sql/pglite@0.5.11))(@electric-sql/pglite@0.5.11)
-      '@faker-js/faker':
-        specifier: ^10.6.0
-        version: 10.6.0
       '@next/env':
         specifier: 16.4.2
         version: 16.4.2
