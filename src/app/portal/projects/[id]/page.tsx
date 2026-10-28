@@ -2,11 +2,14 @@ import { ArrowLeftIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FileList } from "@/components/file-list";
 import { PageHeader } from "@/components/page-header";
+import { CommentForm, UploadForm } from "@/components/project-forms";
 import { MilestoneStatusBadge, ProjectStatusBadge } from "@/components/status-badges";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/format";
 import { requireViewer } from "@/server/auth/viewer";
+import { isUploadConfigured } from "@/server/data/project-updates";
 import { getProject } from "@/server/data/projects";
 
 export const metadata: Metadata = { title: "Project" };
@@ -59,15 +62,26 @@ export default async function PortalProjectPage({ params }: PageProps<"/portal/p
 
       <Card>
         <CardHeader>
-          <CardTitle>Comments</CardTitle>
-          <CardDescription>Posting comments and sharing files arrives with the next update.</CardDescription>
+          <CardTitle>Files</CardTitle>
+          <CardDescription>Share briefs, logos and documents with the agency.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <FileList files={project.files} />
+          <UploadForm projectId={project.id} enabled={isUploadConfigured()} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Comments</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <CommentForm projectId={project.id} canChooseVisibility={false} />
           {project.comments.length === 0 ? (
             <p className="text-sm text-muted-foreground">No comments yet.</p>
           ) : (
             <ul className="space-y-4">
-              {project.comments.map((comment) => (
+              {project.comments.toReversed().map((comment) => (
                 <li key={comment.id} className="rounded-lg bg-muted/50 p-3">
                   <p className="text-sm">{comment.body}</p>
                   <p className="mt-1 text-xs text-muted-foreground">

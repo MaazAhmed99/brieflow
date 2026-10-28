@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FileList } from "@/components/file-list";
+import { CommentForm, UploadForm } from "@/components/project-forms";
 import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
 import { HealthBadge, MilestoneStatusBadge, ProjectStatusBadge } from "@/components/status-badges";
@@ -14,6 +15,7 @@ import { formatDate, formatMoney } from "@/lib/format";
 import { requirePermission } from "@/server/auth/viewer";
 import { can } from "@/server/authz/permissions";
 import { listInvoices } from "@/server/data/invoices";
+import { isUploadConfigured } from "@/server/data/project-updates";
 import { getProject } from "@/server/data/projects";
 
 export const metadata: Metadata = { title: "Project" };
@@ -146,8 +148,9 @@ export default async function ProjectPage({ params }: PageProps<"/app/projects/[
             <CardHeader>
               <CardTitle>Files</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <FileList files={project.files} />
+              {can(viewer, "file:upload") && <UploadForm projectId={project.id} enabled={isUploadConfigured()} />}
             </CardContent>
           </Card>
 
@@ -156,9 +159,10 @@ export default async function ProjectPage({ params }: PageProps<"/app/projects/[
               <CardTitle>Comments</CardTitle>
               <CardDescription>Comments marked internal are hidden from the client.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              {can(viewer, "comment:write") && <CommentForm projectId={project.id} canChooseVisibility />}
               <ul className="space-y-3">
-                {project.comments.map((comment) => (
+                {project.comments.toReversed().map((comment) => (
                   <li key={comment.id} className="rounded-lg bg-muted/50 p-3 text-sm">
                     <p>{comment.body}</p>
                     <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
