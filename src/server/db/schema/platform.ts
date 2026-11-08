@@ -49,6 +49,25 @@ export const notifications = pgTable(
   (t) => [index().on(t.userId, t.readAt)],
 );
 
+// Keys for the read-only REST API. Only a SHA-256 hash of each key is stored
+// (keys are long random strings, so a fast hash is enough); `prefix` is the
+// start of the key, shown so people can tell their keys apart.
+export const apiKeys = pgTable(
+  "api_keys",
+  {
+    id: id(),
+    organizationId: organizationId(),
+    name: text().notNull(),
+    prefix: text().notNull(),
+    keyHash: text().notNull().unique(),
+    createdBy: uuid().references(() => users.id, { onDelete: "set null" }),
+    lastUsedAt: timestamp({ withTimezone: true }),
+    revokedAt: timestamp({ withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index().on(t.organizationId)],
+);
+
 // One row per user per day: counts AI assistant requests and tokens. Shown in
 // settings, and used as the quota counter if Upstash is unavailable.
 export const aiUsage = pgTable(

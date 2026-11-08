@@ -38,3 +38,7 @@ export const demoAccounts = [
 ] as const;
 
 export type DemoRole = (typeof demoAccounts)[number]["role"];
+
+// A public, read-only REST API key for the demo workspace, shown on /docs/api.
+// It can only read Larkspur Digital's sample data, which resets every night.
+export const demoApiKey = "bf_demo_readonly_k7Qm2xVw9Lp4Rt8Zs3Nd";

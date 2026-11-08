@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   description: siteConfig.description,
 };
 
-const REPO_URL = "https://github.com/MaazAhmed99/brieflow";
+const REPO_URL = siteConfig.repoUrl;
 
 const features = [
   { icon: Building2Icon, title: "Clients and contacts", text: "Every client company with its contacts, notes, projects and balances." },
@@ -99,6 +99,7 @@ export default function LandingPage() {
           <nav className="hidden gap-5 text-sm text-muted-foreground sm:flex">
             <a href="#features" className="hover:text-foreground">Features</a>
             <Link href="/roadmap" className="hover:text-foreground">Roadmap</Link>
+            <Link href="/docs/api" className="hover:text-foreground">API</Link>
             <a href={REPO_URL} className="hover:text-foreground">GitHub</a>
           </nav>
           <Button asChild size="sm" className="ml-auto">
@@ -218,6 +219,7 @@ export default function LandingPage() {
           <p>Built by {siteConfig.author}</p>
           <div className="flex gap-5">
             <Link href="/roadmap" className="hover:text-foreground">Roadmap</Link>
+            <Link href="/docs/api" className="hover:text-foreground">API docs</Link>
             <a href={REPO_URL} className="hover:text-foreground">Source code on GitHub</a>
           </div>
         </div>

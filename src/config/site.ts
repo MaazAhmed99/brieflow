@@ -4,4 +4,6 @@ export const siteConfig = {
   description:
     "An all-in-one operations platform for small digital agencies: CRM, projects, invoicing, a client portal and an AI assistant.",
   author: "Maaz Ahmed",
+  url: "https://brieflow-ten.vercel.app",
+  repoUrl: "https://github.com/MaazAhmed99/brieflow",
 };

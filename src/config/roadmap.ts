@@ -23,6 +23,7 @@ export const roadmap: RoadmapSection[] = [
       { title: "Online payments", detail: "A clearly labelled demo checkout today; Stripe test mode switches on when connected." },
       { title: "Comments", detail: "For the agency team and clients; staff choose what the client sees." },
       { title: "Nightly demo reset", detail: "Restores the sample data and fetches the day's ECB exchange rates." },
+      { title: "REST API", detail: "Read-only v1 for clients, projects and invoices, with hashed API keys, rate limits and public docs." },
     ],
   },
   {
@@ -40,7 +41,7 @@ export const roadmap: RoadmapSection[] = [
     status: "planned",
     target: "November 2026",
     items: [
-      { title: "REST API and webhooks", detail: "Versioned read-only API with API keys and docs; signed webhooks for automation tools." },
+      { title: "Webhooks and API keys in settings", detail: "Signed webhooks for automation tools, and creating or revoking API keys from the app." },
       { title: "Emails and real-time notifications", detail: "Invoice emails and live updates when a client comments or pays." },
       { title: "Invoice PDFs", detail: "Download any invoice as a PDF." },
       { title: "Preview modules go live", detail: "Pipeline first, then time tracking, expenses, HR, support and reports." },

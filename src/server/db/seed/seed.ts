@@ -6,7 +6,8 @@ import type {
   PgQueryResultHKT,
   PgTable,
 } from "drizzle-orm/pg-core";
-import { demoAccounts } from "@/config/demo";
+import { demoAccounts, demoApiKey } from "@/config/demo";
+import { apiKeyPrefix, hashApiKey } from "@/lib/api-keys";
 import * as s from "../schema";
 import {
   AGENCY_UPDATES,
@@ -110,6 +111,7 @@ function emptyRows() {
     tickets: [] as Insert<typeof s.tickets>[],
     activityLog: [] as Insert<typeof s.activityLog>[],
     notifications: [] as Insert<typeof s.notifications>[],
+    apiKeys: [] as Insert<typeof s.apiKeys>[],
   };
 }
 
@@ -144,6 +146,7 @@ const INSERT_ORDER: [keyof Rows, PgTable][] = [
   ["tickets", s.tickets],
   ["activityLog", s.activityLog],
   ["notifications", s.notifications],
+  ["apiKeys", s.apiKeys],
 ];
 
 type Ctx = {
@@ -1114,6 +1117,15 @@ export async function seedDatabase(
   });
   addPreviewModules(ctx, larkspur);
   addNotifications(ctx, larkspur);
+
+  // The public read-only REST API key shown on /docs/api.
+  ctx.rows.apiKeys.push({
+    organizationId: larkspur.id,
+    name: "Public demo key (read-only)",
+    prefix: apiKeyPrefix(demoApiKey),
+    keyHash: hashApiKey(demoApiKey),
+    createdBy: larkspur.staff.find((p) => p.role === "admin")?.id,
+  });
 
   buildAgency(ctx, {
     name: "Fernvale Labs",

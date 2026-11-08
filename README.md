@@ -16,6 +16,7 @@ An all-in-one operations platform for small digital agencies: clients, projects,
 | Multi-tenant data isolation | `scopeFor()` in `src/server/authz/scope.ts`, `tests/authz.test.ts` |
 | An AI chatbot that answers questions about your data | `src/server/ai/`, `/app/assistant` |
 | Stripe payments with webhooks | `src/server/payments/`, `src/app/api/stripe/webhook/` |
+| A documented REST API with API keys | `src/server/api/`, `src/app/api/v1/`, `/docs/api` |
 | Secure file uploads | `src/server/data/project-updates.ts`, `src/app/api/files/[id]/` |
 | Third-party API integrations | Groq, Gemini, Stripe, Vercel Blob, Frankfurter, Nager.Date (`src/server/integrations/`) |
 | A Next.js App Router backend without a backend-as-a-service | Server Actions, Route Handlers and a Data Access Layer on PostgreSQL |
@@ -28,10 +29,11 @@ An all-in-one operations platform for small digital agencies: clients, projects,
 4. **Team**: scroll to **Roles and permissions**. This is the same table the server enforces.
 5. Click **Switch role → Try as Client**. The client portal shows only Harbor & Finch's projects and invoices. Pay an invoice (test mode or demo).
 6. Click **Ask AI** and ask "Summarise the latest comments on the Atlas project". One comment contains a prompt-injection attempt; the assistant treats it as data, and its tools can't reach other clients' data anyway.
+7. Open **/docs/api**, copy the curl command and run it. The public demo key reads the same sample data.
 
 ## Features
 
-**Working:** sign-in with one-click demo roles (admin, manager, accountant, staff, client) · dashboard with KPIs and a 12-month revenue chart · clients · projects (table and board) · invoices with multi-currency totals · mark invoices paid · online payment (Stripe test mode or demo mode) · client portal · comments · private file uploads · team and permissions matrix · audit log · AI assistant · nightly demo reset · integration status page.
+**Working:** sign-in with one-click demo roles (admin, manager, accountant, staff, client) · dashboard with KPIs and a 12-month revenue chart · clients · projects (table and board) · invoices with multi-currency totals · mark invoices paid · online payment (Stripe test mode or demo mode) · client portal · comments · private file uploads · team and permissions matrix · audit log · AI assistant · nightly demo reset · integration status page · read-only REST API with public docs.
 
 **Preview (read-only sample data):** sales pipeline · time tracking · expenses and purchase orders · HR directory and leave (with live public holidays) · support tickets · reports.
 
@@ -66,6 +68,11 @@ An all-in-one operations platform for small digital agencies: clients, projects,
 - **Storage:** uploads go to Vercel Blob as private files. The type is detected from the file's bytes (PDF, PNG, JPEG, WebP), the limit is 2 MB and names are sanitised.
 - **Downloads:** files go through `/api/files/[id]`, which checks project access first.
 
+**REST API** (`src/server/api/`, `src/app/api/v1/`).
+- **Endpoints:** read-only v1 for clients, projects and invoices, documented at `/docs/api`.
+- **Keys:** sent as a Bearer token and stored only as a SHA-256 hash. Each key belongs to one organization and goes through the same Data Access Layer as the app, so it can't see another organization's records.
+- **Responses:** every resource passes through a zod schema, so only documented fields leave the server. Errors share one shape, lists share one pagination envelope, and each key is limited to 60 requests a minute.
+
 **Audit log.** Changes write an activity entry in the same transaction as the change itself.
 
 **Nightly reset.**
@@ -96,6 +103,7 @@ The tests run against a real PostgreSQL running in memory (PGlite), with the mig
 - **Access rules:** cross-client and cross-organization isolation, hidden budgets, drafts and internal comments, and role limits.
 - **AI assistant:** a scripted stand-in model checks per-role tools, refused tools, isolation even when the model follows an injected instruction, provider fallback and the daily quota.
 - **Payments:** own-invoice-only payments, idempotent Stripe handling, bad signatures and live-mode events refused.
+- **REST API:** missing, malformed and revoked keys, rate limits, cross-organization 404s, pagination, query validation, and checks that each docs example matches the real response schema.
 - **Comments and uploads:** visibility rules, byte-level type detection and cross-client downloads refused.
 - **Nightly reset and seed:** the reset restores the data, and the seed is consistent and deterministic.
 
